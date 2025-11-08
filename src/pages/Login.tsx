@@ -12,7 +12,7 @@ import { toast } from '@/hooks/use-toast';
 const Login = () => {
   const { login, isAuthenticated, loading } = useAuth();
   const [formData, setFormData] = useState({
-    username: '',
+    email: '',
     password: ''
   });
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -28,7 +28,7 @@ const Login = () => {
     setIsLoggingIn(true);
 
     try {
-      const success = await login(formData.username, formData.password);
+      const success = await login(formData.email, formData.password);
       if (success) {
         toast({
           title: "Inicio de sesión exitoso",
@@ -90,13 +90,13 @@ const Login = () => {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username">Usuario</Label>
+                <Label htmlFor="email">Email</Label>
                 <Input
-                  id="username"
-                  name="username"
-                  type="text"
-                  placeholder="Ingrese su usuario"
-                  value={formData.username}
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="Ingrese su email"
+                  value={formData.email}
                   onChange={handleChange}
                   required
                   disabled={isLoggingIn}

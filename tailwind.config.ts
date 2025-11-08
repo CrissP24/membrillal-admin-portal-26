@@ -25,11 +25,38 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))',
-					light: 'hsl(var(--primary-light))',
-					dark: 'hsl(var(--primary-dark))'
+					DEFAULT: '#1F79B9',
+					100: '#E6F0FA',
+					500: '#1F79B9',
+					600: '#135E94',
+					700: '#0E4A7B',
 				},
+				accent: {
+					DEFAULT: '#147D3F',
+					600: '#147D3F',
+				},
+				warning: {
+					DEFAULT: '#CBA000',
+					600: '#CBA000',
+				},
+				danger: {
+					DEFAULT: '#C62828',
+					600: '#C62828',
+				},
+				info: {
+					DEFAULT: '#1C5D99',
+					600: '#1C5D99',
+				},
+				ink: {
+					100: '#F3F4F6',
+					300: '#D1D5DB',
+					500: '#6B7280',
+					700: '#374151',
+					900: '#1F2937',
+				},
+				canvas: '#FAFAFA',
+				section: '#FFFDF8',
+				admin: '#0B1A2A',
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
 					foreground: 'hsl(var(--secondary-foreground))',
@@ -43,21 +70,9 @@ export default {
 					DEFAULT: 'hsl(var(--success))',
 					foreground: 'hsl(var(--success-foreground))'
 				},
-				warning: {
-					DEFAULT: 'hsl(var(--warning))',
-					foreground: 'hsl(var(--warning-foreground))'
-				},
-				info: {
-					DEFAULT: 'hsl(var(--info))',
-					foreground: 'hsl(var(--info-foreground))'
-				},
 				muted: {
 					DEFAULT: 'hsl(var(--muted))',
 					foreground: 'hsl(var(--muted-foreground))'
-				},
-				accent: {
-					DEFAULT: 'hsl(var(--accent))',
-					foreground: 'hsl(var(--accent-foreground))'
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
@@ -84,17 +99,19 @@ export default {
 				'gradient-hero': 'var(--gradient-hero)'
 			},
 			boxShadow: {
-				'soft': 'var(--shadow-soft)',
+				'soft': '0 8px 24px rgba(0,0,0,.08)',
 				'medium': 'var(--shadow-medium)',
 				'strong': 'var(--shadow-strong)'
 			},
-			transitionProperty: {
-				'smooth': 'var(--transition-smooth)'
-			},
 			borderRadius: {
+				'2xl': '1rem',
+				'xl': '0.75rem',
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
+			},
+			transitionProperty: {
+				'smooth': 'var(--transition-smooth)'
 			},
 			keyframes: {
 				'accordion-down': {

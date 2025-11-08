@@ -1,209 +1,209 @@
-import { useParams, Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Calendar, Eye, Tag, Share2, Download } from "lucide-react";
+import { useEffect, useState } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/ui/components/Badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { ArrowLeft, Calendar, Eye, Tag, Share2, Download, Loader2 } from 'lucide-react';
+import { AppContainer } from '@/ui/components/AppContainer';
+import { noticiasService } from '@/domain/services';
+import type { Noticia } from '@/domain/models/types';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale/es';
+import { EmptyState } from '@/ui/components/EmptyState';
 
 const PublicNoticiaDetalle = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [noticia, setNoticia] = useState<Noticia | null>(null);
+  const [relatedNoticias, setRelatedNoticias] = useState<Noticia[]>([]);
 
-  // En una aplicación real, esto vendría de una API
-  const noticia = {
-    id: parseInt(id || "1"),
-    title: "Inauguración del nuevo centro de salud comunitario",
-    content: `
-      <p>En una ceremonia especial celebrada el pasado viernes, el GAD Parroquial Rural de Membrillal inauguró el nuevo centro de salud comunitario, una obra que beneficiará a más de 3,000 habitantes de la parroquia y comunidades aledañas.</p>
-      
-      <p>La nueva infraestructura de salud cuenta con consultorios médicos especializados, área de emergencias, laboratorio clínico, farmacia comunitaria y espacios para programas de prevención en salud. La inversión total de la obra ascendió a $180,000 dólares, financiados a través del presupuesto participativo y aportes del Gobierno Provincial.</p>
-      
-      <h3>Servicios Disponibles</h3>
-      <p>El centro de salud ofrecerá los siguientes servicios a la comunidad:</p>
-      <ul>
-        <li>Medicina general</li>
-        <li>Pediatría</li>
-        <li>Ginecología</li>
-        <li>Odontología</li>
-        <li>Laboratorio clínico</li>
-        <li>Farmacia comunitaria</li>
-        <li>Programas de prevención</li>
-      </ul>
-      
-      <h3>Horarios de Atención</h3>
-      <p>El centro funcionará de lunes a viernes de 7:00 AM a 5:00 PM, y los sábados de 8:00 AM a 1:00 PM. Para emergencias, se habilitará un sistema de guardia rotativa con el hospital más cercano.</p>
-      
-      <p>La presidente del GAD Parroquial, señora María González, destacó que "esta obra representa un paso fundamental para garantizar el derecho a la salud de nuestros habitantes, especialmente de los adultos mayores y niños que requieren atención médica regular".</p>
-      
-      <p>Durante la ceremonia de inauguración estuvieron presentes autoridades provinciales, cantonales, dirigentes comunitarios y más de 200 habitantes de la parroquia, quienes expresaron su satisfacción por contar con esta nueva infraestructura de salud.</p>
-    `,
-    date: "2024-07-10",
-    category: "Salud",
-    image: "/api/placeholder/1200/600",
-    tags: ["salud", "infraestructura", "comunidad"],
-    views: 342,
-    author: "Comunicación GAD Membrillal"
+  useEffect(() => {
+    if (id) {
+      loadNoticia();
+    }
+  }, [id]);
+
+  const loadNoticia = async () => {
+    if (!id) return;
+    try {
+      setLoading(true);
+      const data = await noticiasService.get(id);
+      if (data) {
+        setNoticia(data);
+        // Incrementar vistas
+        await noticiasService.incrementarVistas(id);
+        // Cargar noticias relacionadas
+        const related = await noticiasService.getByCategoria(data.categoria);
+        setRelatedNoticias(related.filter((n) => n.id !== id).slice(0, 3));
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const relatedNews = [
-    {
-      id: 2,
-      title: "Programa de capacitación en agricultura sostenible",
-      date: "2024-07-08",
-      image: "/api/placeholder/300/200"
-    },
-    {
-      id: 3,
-      title: "Mejoramiento de vías rurales - Fase II",
-      date: "2024-07-05",
-      image: "/api/placeholder/300/200"
-    }
-  ];
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-canvas py-12">
+        <AppContainer>
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+          </div>
+        </AppContainer>
+      </div>
+    );
+  }
+
+  if (!noticia) {
+    return (
+      <div className="min-h-screen bg-canvas py-12">
+        <AppContainer>
+          <EmptyState
+            title="Noticia no encontrada"
+            description="La noticia que buscas no existe o ha sido eliminada"
+            action={{
+              label: 'Volver a noticias',
+              onClick: () => navigate('/public/noticias'),
+            }}
+          />
+        </AppContainer>
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Back Button */}
-      <div className="mb-6">
-        <Button variant="outline" asChild>
-          <Link to="/public/noticias">
+    <div className="min-h-screen bg-canvas py-12">
+      <AppContainer>
+        {/* Back Button */}
+        <div className="mb-6">
+          <Button variant="outline" onClick={() => navigate('/public/noticias')}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             Volver a noticias
-          </Link>
-        </Button>
-      </div>
+          </Button>
+        </div>
 
-      <div className="grid lg:grid-cols-3 gap-8">
-        {/* Main Content */}
-        <div className="lg:col-span-2">
-          {/* Header */}
-          <div className="mb-6">
-            <div className="flex items-center gap-4 mb-4">
-              <Badge variant="secondary">{noticia.category}</Badge>
-              <div className="flex items-center text-sm text-muted-foreground">
-                <Eye className="h-4 w-4 mr-1" />
-                {noticia.views} visualizaciones
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2">
+            {/* Header */}
+            <div className="mb-6">
+              <div className="flex items-center gap-4 mb-4">
+                <Badge>{noticia.categoria}</Badge>
+                <div className="flex items-center text-sm text-ink-600">
+                  <Eye className="h-4 w-4 mr-1" />
+                  {noticia.vistas} visualizaciones
+                </div>
+              </div>
+
+              <h1 className="text-3xl md:text-4xl font-bold text-ink-900 mb-4">{noticia.titulo}</h1>
+
+              <div className="flex items-center gap-4 text-ink-600 mb-6">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  {format(new Date(noticia.publishedAt), "dd 'de' MMMM 'de' yyyy", { locale: es })}
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-2 mb-6">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    if (navigator.share) {
+                      navigator.share({
+                        title: noticia.titulo,
+                        text: noticia.cuerpoHtml.replace(/<[^>]*>/g, '').substring(0, 100),
+                        url: window.location.href,
+                      });
+                    }
+                  }}
+                >
+                  <Share2 className="h-4 w-4 mr-2" />
+                  Compartir
+                </Button>
               </div>
             </div>
-            
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">{noticia.title}</h1>
-            
-            <div className="flex items-center gap-4 text-muted-foreground mb-6">
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                {new Date(noticia.date).toLocaleDateString('es-ES', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
+
+            {/* Featured Image */}
+            {noticia.portadaUrl && (
+              <div className="mb-8">
+                <img
+                  src={noticia.portadaUrl}
+                  alt={noticia.titulo}
+                  className="w-full h-[400px] object-cover rounded-2xl"
+                />
               </div>
-              <span>Por: {noticia.author}</span>
-            </div>
+            )}
 
-            {/* Action Buttons */}
-            <div className="flex gap-2 mb-6">
-              <Button variant="outline" size="sm">
-                <Share2 className="h-4 w-4 mr-2" />
-                Compartir
-              </Button>
-              <Button variant="outline" size="sm">
-                <Download className="h-4 w-4 mr-2" />
-                Descargar PDF
-              </Button>
-            </div>
-          </div>
-
-          {/* Featured Image */}
-          <div className="mb-8">
-            <img 
-              src={noticia.image} 
-              alt={noticia.title}
-              className="w-full h-[400px] object-cover rounded-lg"
+            {/* Content */}
+            <div
+              className="prose prose-lg max-w-none mb-8"
+              dangerouslySetInnerHTML={{ __html: noticia.cuerpoHtml }}
             />
+
+            {/* Tags */}
+            {noticia.etiquetas && noticia.etiquetas.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-ink-900 mb-3">Etiquetas</h3>
+                <div className="flex flex-wrap gap-2">
+                  {noticia.etiquetas.map((tag, index) => (
+                    <Badge key={index} variant="default">
+                      <Tag className="h-3 w-3 mr-1" />
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Content */}
-          <div 
-            className="prose prose-lg max-w-none mb-8"
-            dangerouslySetInnerHTML={{ __html: noticia.content }}
-          />
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Related News */}
+            {relatedNoticias.length > 0 && (
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-semibold text-ink-900 mb-4">Noticias relacionadas</h3>
+                  <div className="space-y-4">
+                    {relatedNoticias.map((news) => (
+                      <Link
+                        key={news.id}
+                        to={`/public/noticias/${news.id}`}
+                        className="block group"
+                      >
+                        <div className="flex gap-3">
+                          {news.portadaUrl && (
+                            <img
+                              src={news.portadaUrl}
+                              alt={news.titulo}
+                              className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
+                            />
+                          )}
+                          <div>
+                            <h4 className="font-medium line-clamp-2 group-hover:text-primary-600 transition-colors text-ink-900">
+                              {news.titulo}
+                            </h4>
+                            <p className="text-sm text-ink-500 mt-1">
+                              {format(new Date(news.publishedAt), 'dd MMM yyyy', { locale: es })}
+                            </p>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
 
-          {/* Tags */}
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold mb-3">Etiquetas</h3>
-            <div className="flex flex-wrap gap-2">
-              {noticia.tags.map((tag, index) => (
-                <Badge key={index} variant="outline">
-                  <Tag className="h-3 w-3 mr-1" />
-                  {tag}
-                </Badge>
-              ))}
-            </div>
+                  <Button variant="outline" className="w-full mt-4" onClick={() => navigate('/public/noticias')}>
+                    Ver todas las noticias
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
           </div>
-
-          {/* Share Section */}
-          <Card>
-            <CardContent className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Compartir esta noticia</h3>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm">Facebook</Button>
-                <Button variant="outline" size="sm">Twitter</Button>
-                <Button variant="outline" size="sm">WhatsApp</Button>
-                <Button variant="outline" size="sm">Email</Button>
-              </div>
-            </CardContent>
-          </Card>
         </div>
-
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Related News */}
-          <Card>
-            <CardContent className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Noticias relacionadas</h3>
-              <div className="space-y-4">
-                {relatedNews.map((news) => (
-                  <Link 
-                    key={news.id}
-                    to={`/public/noticias/${news.id}`}
-                    className="block group"
-                  >
-                    <div className="flex gap-3">
-                      <img 
-                        src={news.image} 
-                        alt={news.title}
-                        className="w-20 h-20 object-cover rounded flex-shrink-0"
-                      />
-                      <div>
-                        <h4 className="font-medium line-clamp-2 group-hover:text-primary transition-colors">
-                          {news.title}
-                        </h4>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {new Date(news.date).toLocaleDateString('es-ES')}
-                        </p>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-              
-              <Button variant="outline" className="w-full mt-4" asChild>
-                <Link to="/public/noticias">Ver todas las noticias</Link>
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Newsletter */}
-          <Card>
-            <CardContent className="p-6">
-              <h3 className="text-lg font-semibold mb-2">Mantente informado</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Suscríbete para recibir las últimas noticias de la parroquia
-              </p>
-              <Button className="w-full">
-                Suscribirse
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      </AppContainer>
     </div>
   );
 };

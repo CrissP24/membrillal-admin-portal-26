@@ -1,8 +1,8 @@
-import PublicHome from "./PublicHome";
+import { Navigate } from 'react-router-dom';
 
 const Index = () => {
-  // Show public homepage as the main entry point
-  return <PublicHome />;
+  // Redirect to public inicio
+  return <Navigate to="/public/inicio" replace />;
 };
 
 export default Index;

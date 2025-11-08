@@ -49,7 +49,12 @@ const DashboardSidebar = () => {
   const currentPath = location.pathname;
   const collapsed = state === 'collapsed';
 
-  const isActive = (path: string) => currentPath === path;
+  const isActive = (path: string) => {
+    // Handle query params
+    const pathWithoutQuery = path.split('?')[0];
+    const currentPathWithoutQuery = currentPath.split('?')[0];
+    return currentPathWithoutQuery === pathWithoutQuery || currentPath.startsWith(pathWithoutQuery + '/');
+  };
   const isGroupActive = (item: any) => {
     if (item.path) return isActive(item.path);
     if (item.children) {

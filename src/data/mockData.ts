@@ -107,59 +107,62 @@ export const sidebarData = [
     title: "Gestión Institucional",
     icon: "building",
     children: [
-      { title: "Parroquia", path: "/institucional/parroquia" },
-      { title: "Organización GAD", path: "/institucional/organizacion" },
-      { title: "Comisiones", path: "/institucional/comisiones" },
-      { title: "Marco Legal", path: "/institucional/marco-legal" }
+      { title: "Parroquia", path: "/dashboard/institucional/parroquia" },
+      { title: "Organización GAD", path: "/dashboard/institucional/organizacion" },
+      { title: "Comisiones", path: "/dashboard/institucional/comisiones" },
+      { title: "Marco Legal", path: "/dashboard/institucional/marco-legal" }
     ]
   },
   {
     title: "Transparencia",
     icon: "scale",
     children: [
-      { title: "Rendición de Cuentas", path: "/transparencia/rendicion" },
-      { title: "Presupuesto", path: "/transparencia/presupuesto" },
-      { title: "Licitaciones y Convenios", path: "/transparencia/licitaciones" },
-      { title: "Solicitudes Información", path: "/transparencia/solicitudes" }
+      { title: "Rendición de Cuentas", path: "/dashboard/transparencia?tab=rendicion" },
+      { title: "Presupuesto", path: "/dashboard/transparencia?tab=presupuesto" },
+      { title: "Licitaciones y Convenios", path: "/dashboard/transparencia?tab=licitaciones" },
+      { title: "Solicitudes Información", path: "/dashboard/transparencia?tab=solicitudes" }
     ]
   },
   {
     title: "Servicios en Línea",
     icon: "clipboard-list",
-    path: "/servicios/tramites"
+    children: [
+      { title: "Definiciones de Trámites", path: "/dashboard/servicios/tramites" },
+      { title: "Bandeja de Solicitudes", path: "/dashboard/solicitudes" }
+    ]
   },
   {
     title: "Noticias y Comunicados",
     icon: "newspaper",
     children: [
-      { title: "Noticias", path: "/noticias" },
-      { title: "Comunicados", path: "/comunicados" }
+      { title: "Noticias", path: "/dashboard/noticias" },
+      { title: "Comunicados", path: "/dashboard/comunicados" }
     ]
   },
   {
     title: "Eventos y Agenda",
     icon: "calendar",
-    path: "/eventos"
+    path: "/dashboard/eventos"
   },
   {
     title: "Turismo y Cultura",
     icon: "map-pin",
-    path: "/turismo"
+    path: "/dashboard/turismo"
   },
   {
     title: "Gestión Documental",
     icon: "folder-open",
-    path: "/documentos"
+    path: "/dashboard/documentos"
   },
   {
     title: "Reportes y Estadísticas",
     icon: "bar-chart-3",
-    path: "/reportes"
+    path: "/dashboard/reportes"
   },
   {
     title: "Configuración",
     icon: "settings",
-    path: "/configuracion"
+    path: "/dashboard/configuracion"
   }
 ];
 

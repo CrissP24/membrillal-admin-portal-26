@@ -1,21 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { mockAuth } from '@/data/mockData';
-
-interface User {
-  id: number;
-  username: string;
-  email: string;
-  role: string;
-  fullName: string;
-  avatar: string;
-  lastLogin: string;
-  status: string;
-}
+import { authService } from '@/domain/services';
+import type { Usuario } from '@/domain/models/types';
 
 interface AuthContextType {
-  user: User | null;
+  user: Usuario | null;
   isAuthenticated: boolean;
-  login: (username: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   loading: boolean;
 }
@@ -31,55 +21,60 @@ export const useAuth = () => {
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<Usuario | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Check for stored user session
     const storedUser = localStorage.getItem('gad_user');
-    const storedToken = localStorage.getItem('gad_token');
     
-    if (storedUser && storedToken) {
+    if (storedUser) {
       try {
-        setUser(JSON.parse(storedUser));
+        const userData = JSON.parse(storedUser);
+        // Verify user still exists
+        authService.getUsuario(userData.id).then((usuario) => {
+          if (usuario) {
+            setUser(usuario);
+          } else {
+            localStorage.removeItem('gad_user');
+          }
+          setLoading(false);
+        });
       } catch (error) {
         console.error('Error parsing stored user:', error);
         localStorage.removeItem('gad_user');
-        localStorage.removeItem('gad_token');
+        setLoading(false);
       }
+    } else {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
-  const login = async (username: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<boolean> => {
     setLoading(true);
     
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const foundUser = mockAuth.users.find(
-      u => u.username === username && u.password === password
-    );
-
-    if (foundUser) {
-      const { password: _, ...userWithoutPassword } = foundUser;
-      const token = `mock_token_${foundUser.id}_${Date.now()}`;
+    try {
+      const usuario = await authService.login(email, password);
       
-      setUser(userWithoutPassword);
-      localStorage.setItem('gad_user', JSON.stringify(userWithoutPassword));
-      localStorage.setItem('gad_token', token);
+      if (usuario) {
+        setUser(usuario);
+        localStorage.setItem('gad_user', JSON.stringify(usuario));
+        setLoading(false);
+        return true;
+      }
+      
       setLoading(false);
-      return true;
+      return false;
+    } catch (error) {
+      console.error('Login error:', error);
+      setLoading(false);
+      return false;
     }
-    
-    setLoading(false);
-    return false;
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('gad_user');
-    localStorage.removeItem('gad_token');
   };
 
   const value = {
