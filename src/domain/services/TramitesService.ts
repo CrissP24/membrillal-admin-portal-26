@@ -3,7 +3,7 @@ import type { ID, TramiteInstancia, Ciudadano, Adj, EstadoSolicitud, Log } from 
 import { dataStore } from '@/data/store';
 
 export class TramitesService {
-  async iniciarSolicitud(tramiteId: ID, ciudadano: Ciudadano): Promise<TramiteInstancia> {
+  async iniciarSolicitud(tramiteId: ID, ciudadano: Ciudadano, solicitud?: string): Promise<TramiteInstancia> {
     const tramite = await tramiteDefRepo.get(tramiteId);
     if (!tramite) {
       throw new Error('Trámite no encontrado');
@@ -34,6 +34,7 @@ export class TramitesService {
         nota: 'Solicitud iniciada por ciudadano',
       }],
       adjuntos: [],
+      solicitud,
     };
 
     return await tramiteInstRepo.create(instancia);

@@ -107,6 +107,7 @@ export interface TramiteInstancia {
   folio: string;
   historial: Log[];
   adjuntos?: Adj[];
+  solicitud?: string;
   createdAt: string;
   updatedAt: string;
 }

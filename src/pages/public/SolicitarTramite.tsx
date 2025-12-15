@@ -18,7 +18,7 @@ import { toast } from '@/hooks/use-toast';
 const ciudadanoSchema = z.object({
   nombres: z.string().min(3, 'Los nombres deben tener al menos 3 caracteres'),
   documento: z.string().regex(/^\d{10}$/, 'El documento debe tener 10 dígitos'),
-  email: z.string().email('Email inválido'),
+  email: z.string().email('Email inválido').optional(),
   telefono: z.string().optional(),
 });
 
@@ -39,6 +39,7 @@ const SolicitarTramite: React.FC = () => {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [adjuntos, setAdjuntos] = useState<Adj[]>([]);
+  const [solicitud, setSolicitud] = useState<string>('');
   const [instanciaId, setInstanciaId] = useState<string | null>(null);
   const [folio, setFolio] = useState<string>('');
 
@@ -114,7 +115,8 @@ const SolicitarTramite: React.FC = () => {
       // Create instance
       const instancia = await tramitesService.iniciarSolicitud(
         tramiteId,
-        ciudadano as Ciudadano
+        ciudadano as Ciudadano,
+        solicitud
       );
       setInstanciaId(instancia.id);
 
@@ -178,7 +180,11 @@ const SolicitarTramite: React.FC = () => {
   }
 
   if (!tramite) {
-    return null;
+    return (
+      <div className="min-h-screen flex items-center justify-center text-ink-600">
+        <p>Trámite no encontrado o no disponible.</p>
+      </div>
+    );
   }
 
   return (
@@ -253,7 +259,7 @@ const SolicitarTramite: React.FC = () => {
                     )}
                   </div>
                   <div>
-                    <Label htmlFor="email">Email *</Label>
+                    <Label htmlFor="email">Email</Label>
                     <Input
                       id="email"
                       type="email"
@@ -315,6 +321,17 @@ const SolicitarTramite: React.FC = () => {
                       ))}
                     </div>
                   )}
+                </div>
+                <div>
+                  <Label htmlFor="motivoSolicitud">Motivo de la Solicitud (Opcional)</Label>
+                  <Textarea
+                    id="motivoSolicitud"
+                    value={solicitud}
+                    onChange={(e) => setSolicitud(e.target.value)}
+                    placeholder="Describe brevemente tu requerimiento..."
+                    rows={3}
+                    className="mt-1"
+                  />
                 </div>
                 <div className="flex justify-between gap-2">
                   <Button variant="outline" onClick={() => setStep(1)}>
